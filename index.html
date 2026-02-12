@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonflix - Open Source Streaming</title>
+    <style>
+        :root { --accent: #8e44ad; --bg: #060606; --card: #121212; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: var(--bg); color: white; margin: 0; overflow-x: hidden; }
+        
+        nav { background: rgba(0,0,0,0.9); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: fixed; width: 100%; top: 0; z-index: 100; box-sizing: border-box; }
+        .logo { color: var(--accent); font-size: 1.8rem; font-weight: 900; letter-spacing: 2px; cursor: pointer; text-decoration:none; }
+        
+        .search-box { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 5px 15px; border: 1px solid #444; display: flex; }
+        input { background: transparent; border: none; color: white; outline: none; width: 180px; padding: 5px; }
+
+        .hero-banner {
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(to bottom, #111, var(--bg));
+            padding-top: 60px;
+        }
+        .hero-banner h1 {
+            font-size: 6rem;
+            margin: 0;
+            color: var(--accent);
+            font-weight: 900;
+            letter-spacing: 5px;
+            text-shadow: 0 0 30px rgba(142, 68, 173, 0.5);
+        }
+        .hero-banner p {
+            font-size: 1.5rem;
+            color: #ccc;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+
+        .container { padding: 20px 5% 50px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; }
+        
+        .card { background: var(--card); border-radius: 12px; overflow: hidden; transition: 0.3s; cursor: pointer; border: 1px solid #222; }
+        .card:hover { transform: scale(1.05); border-color: var(--accent); }
+        .card img { width: 100%; height: 300px; object-fit: cover; }
+        .card-info { padding: 12px; font-weight: bold; font-size: 0.9rem; text-align: center; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; z-index: 1000; overflow-y: auto; }
+        .modal-content { max-width: 800px; margin: 50px auto; background: #181818; border-radius: 15px; overflow: hidden; position: relative; }
+        .modal-details { padding: 40px; }
+        .play-btn { background: white; color: black; border: none; padding: 15px 40px; font-size: 1.2rem; font-weight: bold; border-radius: 8px; cursor: pointer; margin-bottom: 20px; transition: 0.2s; }
+        .play-btn:hover { background: #eee; transform: scale(1.05); }
+        .close-btn { position: absolute; top: 20px; right: 20px; font-size: 40px; cursor: pointer; color: white; z-index: 1100; }
+        #player-box { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; display: none; z-index: 2000; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo" onclick="location.reload()">MOONFLIX</div>
+    <div class="search-box">
+        <input type="text" id="sInput" placeholder="Search movies..." onkeyup="if(event.key==='Enter') doSearch()">
+        <button onclick="doSearch()" style="background:none; border:none; color:white; cursor:pointer;">🔍</button>
+    </div>
+</nav>
+
+<div class="hero-banner">
+    <h1>MOONFLIX</h1>
+    <p>Open-Source Entertainment Service</p>
+</div>
+
+<div class="container">
+    <h2 id="title" style="color:var(--accent)">Trending Now</h2>
+    <div id="grid" class="grid"></div>
+</div>
+
+<div id="infoModal" class="modal">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <div class="modal-content">
+        <div class="modal-details">
+            <h1 id="mTitle" style="font-size: 3rem; margin: 0 0 10px;"></h1>
+            <p id="mMeta" style="color: #46d369; font-weight: bold; margin-bottom: 20px;"></p>
+            <button class="play-btn" id="playBtn">▶ PLAY</button>
+            <p id="mDesc" style="font-size: 1.1rem; line-height: 1.6;"></p>
+        </div>
+    </div>
+</div>
+
+<div id="player-box">
+    <span class="close-btn" onclick="closePlayer()">&times;</span>
+    <div id="videoArea" style="width:100%; height:100%;"></div>
+</div>
+
+<script>
+    // --- CONFIGURATION ---
+    // ADD YOUR TMDB API KEY HERE
+    const API_KEY = 'YOUR_API_KEY_HERE'; 
+    const BASE_URL = 'https://api.themoviedb.org/3';
+
+    async function loadPop() {
+        if (API_KEY === 'YOUR_API_KEY_HERE') {
+            document.getElementById('grid').innerHTML = '<p style="color:orange; font-size:1.2rem; text-align:center; width:100%;">Project Status: Open Source Ready.<br>Please add your TMDB API Key to the index.html file to load content.</p>';
+            return;
+        }
+        const url = `${BASE_URL}/trending/all/day?api_key=${API_KEY}&language=en-US`;
+        const res = await fetch(url);
+        const data = await res.json();
+        render(data.results);
+    }
+
+    async function doSearch() {
+        const q = document.getElementById('sInput').value;
+        if(!q) return;
+        const url = `${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(q)}&language=en-US`;
+        const res = await fetch(url);
+        const data = await res.json();
+        document.getElementById('title').innerText = `Results for: ${q}`;
+        document.querySelector('.hero-banner').style.display = 'none';
+        render(data.results);
+    }
+
+    function render(list) {
+        const g = document.getElementById('grid');
+        g.innerHTML = '';
+        list.forEach(m => {
+            if(!m.poster_path) return;
+            const d = document.createElement('div');
+            d.className = 'card';
+            d.onclick = () => showInfo(m);
+            d.innerHTML = `
+                <img src="https://image.tmdb.org/t/p/w500${m.poster_path}">
+                <div class="card-info">${m.title || m.name}</div>
+            `;
+            g.appendChild(d);
+        });
+    }
+
+    function showInfo(m) {
+        const type = m.media_type || (m.title ? 'movie' : 'tv');
+        document.getElementById('mTitle').innerText = m.title || m.name;
+        document.getElementById('mDesc').innerText = m.overview || "No description available.";
+        const year = (m.release_date || m.first_air_date || '').split('-')[0];
+        document.getElementById('mMeta').innerText = `${year}  •  Rating: ⭐ ${m.vote_average.toFixed(1)}`;
+        document.getElementById('playBtn').onclick = () => {
+            document.getElementById('player-box').style.display = 'block';
+            document.getElementById('videoArea').innerHTML = `<iframe src="https://vidsrc-embed.ru/embed/${type}/${m.id}" allowfullscreen></iframe>`;
+        };
+        document.getElementById('infoModal').style.display = 'block';
+    }
+
+    function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
+    function closePlayer() { 
+        document.getElementById('player-box').style.display = 'none'; 
+        document.getElementById('videoArea').innerHTML = ''; 
+    }
+
+    window.onload = loadPop;
+</script>
+
+</body>
+</html>
