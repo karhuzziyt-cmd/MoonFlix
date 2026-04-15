@@ -101,7 +101,7 @@
 
     async function loadPop() {
         if (API_KEY === 'YOUR_API_KEY_HERE') {
-            document.getElementById('grid').innerHTML = '<p style="color:orange; font-size:1.2rem; text-align:center; width:100%;">Project Status: Open Source Ready.<br>Please add your TMDB API Key to the index.html file to load content.</p>';
+            document.getElementById('grid').innerHTML = '<p style="color:orange; font-size:1.2rem; text-align:center; width:100%;">Project Status: Open Source Ready.<br>Please add your TMDB API Key to the index.html file to load content. if you dont have tmbd api get it from tmbd.com</p>';
             return;
         }
         const url = `${BASE_URL}/trending/all/day?api_key=${API_KEY}&language=en-US`;
