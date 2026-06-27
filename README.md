@@ -31,3 +31,5 @@ This project is released under the **MIT License**. You are free to use, modify,
 
 ---
 *Credits: MaitoHoo & Moonflix2026*
+
+Contributors: Karhuzziyt-CMD, Moonflix 
