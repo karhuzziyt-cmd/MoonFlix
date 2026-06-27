@@ -28,4 +28,4 @@ To use this service, you need a free API Key from [The Movie Database (TMDB)](ht
 This project is released under the **MIT License**. You are free to use, modify, and distribute it.
 
 ---
-*Owned and Managed by Mäntylä Corporation (Veeti Savolainen).*
+*Credits: MaitoHoo & Moonflix2026*
