@@ -2,6 +2,8 @@
 
 Moonflix is a lightweight, high-performance, and open-source streaming interface built with HTML, CSS, and JavaScript. It uses the TMDB API to fetch movie and TV show data and provides a premium, Netflix-inspired user experience.
 
+<iframe src="https://github.com/karhuzziyt-cmd/MoonFlix/blob/main/MOONFLIX.jpg?raw=true" width="100%" height="500px" style="border:none;" title="MoonFlix"></iframe>
+
 ## 🚀 Features
 - **Cinematic UI:** Large hero banner and responsive movie grid.
 - **Detailed Previews:** Interactive modal with movie descriptions, ratings, and backdrops.
